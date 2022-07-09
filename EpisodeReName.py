@@ -5,6 +5,7 @@ import platform
 import re
 import sys
 import time
+import shutil
 from datetime import datetime
 from itertools import product
 
@@ -271,6 +272,20 @@ def get_series_from_season_path(season_path):
         series = series[:-6].strip()
     return series
 
+def get_series_name(file_path):
+
+    file_full_name = os.path.basename(file_path)
+
+    logger.info(f"{'获取视频名', file_full_name}")
+
+    pat = '\](.*?)\['
+    res = re.findall(pat, file_full_name)
+    if res:
+            series = res[0]
+            logger.info(f"{'获取视频名', series}")
+            return series
+
+    return None
 
 def get_season_and_ep(file_path):
     logger.info(f"{'解析文件', file_path}")
@@ -285,10 +300,10 @@ def get_season_and_ep(file_path):
     # 获取文件名和后缀
     file_name, ext = get_file_name_ext(file_full_name)
 
-    _ = get_season_cascaded(parent_folder_path)
-    if not _:
-        # logger.info(f"{'不在season文件夹内 忽略'}")
-        return None, None
+    # _ = get_season_cascaded(parent_folder_path)
+    # if not _:
+    #     # logger.info(f"{'不在season文件夹内 忽略'}")
+    #     return None, None
 
     # 忽略已按规则命名的文件
     pat = 'S(\d{1,4})E(\d{1,4}(\.5)?)'
@@ -319,7 +334,7 @@ def get_season_and_ep(file_path):
         ep = str(int(ep)).zfill(2)
         return season, ep
 
-    season = get_season_cascaded(parent_folder_path)
+    season = '01'
 
     # 获取不到季数 退出
     if not season:
@@ -603,12 +618,14 @@ if os.path.isdir(target_path):
             file_path = os.path.abspath(file_path)
             # 不在 Season 目录下不处理
             # 父级文件夹
-            parent_folder_path = os.path.dirname(file_path)
 
-            _ = get_season_cascaded(parent_folder_path)
-            if not _:
-                # logger.info(f"{'不在season文件夹内 忽略'}")
-                continue
+            ## huiping: 不需要父级文件夹
+            # parent_folder_path = os.path.dirname(file_path)
+            #
+            # _ = get_season_cascaded(parent_folder_path)
+            # if not _:
+            #     # logger.info(f"{'不在season文件夹内 忽略'}")
+            #     continue
 
             # 忽略部分文件
             if name.lower() in ['season.nfo', 'all.txt']:
@@ -616,7 +633,7 @@ if os.path.isdir(target_path):
             file_name, ext = get_file_name_ext(name)
 
             # 只处理特定后缀
-            if not ext.lower() in ['jpg', 'png', 'nfo', 'torrent']:
+            if not ext.lower() in ['jpg', 'png', 'nfo', 'torrent', 'zip', 'rar']:
                 continue
 
             res = re.findall('^S(\d{1,4})E(\d{1,4}(\.5)?)', file_name.upper())
@@ -644,24 +661,34 @@ if os.path.isdir(target_path):
             # 重命名
             if season and ep:
                 # 修正集数
-                ep = ep_offset_patch(file_path, ep)
-                season_path = get_season_path(file_path)
-                # 系列名称
-                series = get_series_from_season_path(season_path)
+                # ep = ep_offset_patch(file_path, ep)
+                # season_path = get_season_path(file_path)
+                # # 系列名称
+                # series = get_series_from_season_path(season_path)
                 # new_name = f'S{season}E{ep}' + '.' + fix_ext(ext)
-                new_name = name_format.format(**locals()) + '.' + fix_ext(ext)
 
-                if custom_replace_pair:
-                    # 自定义替换关键字
-                    for replace_old_part, replace_new_part in custom_replace_pair:
-                        new_name = new_name.replace(replace_old_part, replace_new_part)
+                series_name = get_series_name(file_path)
 
+                new_name = series_name + ' ' + name_format.format(**locals()) + '.' + fix_ext(ext)
+
+                # if custom_replace_pair:
+                #     # 自定义替换关键字
+                #     for replace_old_part, replace_new_part in custom_replace_pair:
+                #         new_name = new_name.replace(replace_old_part, replace_new_part)
                 logger.info(f'{new_name}')
-                if move_up_to_season_folder:
-                    new_path = season_path + '/' + new_name
-                else:
-                    new_path = parent_folder_path + '/' + new_name
-                file_lists.append([format_path(file_path), format_path(new_path)])
+
+
+                new_path = '/anime/' + series_name + '/' + new_name
+
+                logger.info(f'{new_path}')
+                # file_lists.append([format_path(file_path), format_path(new_path)])
+
+                ### 先不改名
+                # if move_up_to_season_folder:
+                #     new_path = season_path + '/' + new_name
+                # else:
+                #     new_path = parent_folder_path + '/' + new_name
+                # file_lists.append([format_path(file_path), format_path(new_path)])
             else:
                 logger.info(f"{'未能识别'}")
                 unknown.append(file_path)
@@ -676,28 +703,26 @@ else:
         season, ep = get_season_and_ep(file_path)
         if season and ep:
             # 修正集数
-            ep = ep_offset_patch(file_path, ep)
-            season_path = get_season_path(file_path)
+            # ep = ep_offset_patch(file_path, ep)
+            # season_path = get_season_path(file_path)
             # 系列名称
-            series = get_series_from_season_path(season_path)
+            # series = get_series_from_season_path(season_path)
             # new_name = f'S{season}E{ep}' + '.' + fix_ext(ext)
-            new_name = name_format.format(**locals()) + '.' + fix_ext(ext)
+            series_name = get_series_name(file_path)
 
-            if custom_replace_pair:
-                # 自定义替换关键字
-                for replace_old_part, replace_new_part in custom_replace_pair:
-                    new_name = new_name.replace(replace_old_part, replace_new_part)
-
+            new_name = series_name + ' ' + name_format.format(**locals()) + '.' + fix_ext(ext)
             logger.info(f'{new_name}')
-            if move_up_to_season_folder:
-                new_path = format_path(season_path + '/' + new_name)
-            else:
-                new_path = format_path(parent_folder_path + '/' + new_name)
+
+                # 自定义替换关键字
+                # for replace_old_part, replace_new_part in custom_replace_pair:
+                #     new_name = new_name.replace(replace_old_part, replace_new_part)
+
+            new_path = '/Users/huiping.guo/anime/' + series_name + '/' + new_name
+
+            logger.info(f'{new_path}')
 
             file_lists.append([file_path, new_path])
-        else:
-            logger.info(f"{'未能识别'}")
-            unknown.append(file_path)
+
 
 if unknown:
     logger.info(f"{'----- 未识别文件 -----'}")
@@ -726,15 +751,21 @@ for old, new in file_lists:
     # 默认遇到文件存在则强制删除已存在文件
     try:
         # 检测文件能否重命名 报错直接忽略
-        tmp_name = new + '.new'
-        os.rename(old, tmp_name)
 
         # 目标文件已存在, 先删除
         if os.path.exists(new):
             os.remove(new)
 
+        file_path = os.path.abspath(os.path.join(new, os.pardir))
+
+        if not os.path.exists(file_path):
+            os.makedirs(file_path)
+
+        logger.info(f"{'path', file_path}")
         # 临时文件重命名
-        os.rename(tmp_name, new)
+        # os.rename(tmp_name, new)
+        shutil.move(old, new)
+
     except:
         pass
 
