@@ -681,7 +681,7 @@ if os.path.isdir(target_path):
                 new_path = '/anime/' + series_name + '/' + new_name
 
                 logger.info(f'{new_path}')
-                # file_lists.append([format_path(file_path), format_path(new_path)])
+                file_lists.append([format_path(file_path), format_path(new_path)])
 
                 ### 先不改名
                 # if move_up_to_season_folder:
@@ -717,7 +717,7 @@ else:
                 # for replace_old_part, replace_new_part in custom_replace_pair:
                 #     new_name = new_name.replace(replace_old_part, replace_new_part)
 
-            new_path = '/Users/huiping.guo/anime/' + series_name + '/' + new_name
+            new_path = '/anime/' + series_name + '/' + new_name
 
             logger.info(f'{new_path}')
 
