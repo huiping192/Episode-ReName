@@ -632,36 +632,36 @@ def ep_offset_patch(file_path, ep):
 if os.path.isdir(target_path):
     logger.info(f"{'文件夹处理'}")
     # 删除多余文件
-    for root, dirs, files in os.walk(target_path, topdown=False):
-        for name in files:
-            file_path = os.path.join(root, name).replace('\\', '/')
-            file_path = os.path.abspath(file_path)
-            # 不在 Season 目录下不处理
-            # 父级文件夹
-
-            ## huiping: 不需要父级文件夹
-            # parent_folder_path = os.path.dirname(file_path)
-            #
-            # _ = get_season_cascaded(parent_folder_path)
-            # if not _:
-            #     # logger.info(f"{'不在season文件夹内 忽略'}")
-            #     continue
-
-            # 忽略部分文件
-            if name.lower() in ['season.nfo', 'all.txt']:
-                continue
-            file_name, ext = get_file_name_ext(name)
-
-            # 只处理特定后缀
-            if not ext.lower() in ['jpg', 'png', 'nfo', 'torrent', 'zip', 'rar']:
-                continue
-
-            res = re.findall('^S(\d{1,4})E(\d{1,4}(\.5)?)', file_name.upper())
-            if res:
-                continue
-            else:
-                logger.info(f'{file_path}')
-                os.remove(file_path)
+    # for root, dirs, files in os.walk(target_path, topdown=False):
+    #     for name in files:
+    #         file_path = os.path.join(root, name).replace('\\', '/')
+    #         file_path = os.path.abspath(file_path)
+    #         # 不在 Season 目录下不处理
+    #         # 父级文件夹
+    #
+    #         ## huiping: 不需要父级文件夹
+    #         # parent_folder_path = os.path.dirname(file_path)
+    #         #
+    #         # _ = get_season_cascaded(parent_folder_path)
+    #         # if not _:
+    #         #     # logger.info(f"{'不在season文件夹内 忽略'}")
+    #         #     continue
+    #
+    #         # 忽略部分文件
+    #         if name.lower() in ['season.nfo', 'all.txt']:
+    #             continue
+    #         file_name, ext = get_file_name_ext(name)
+    #
+    #         # 只处理特定后缀
+    #         if not ext.lower() in ['jpg', 'png', 'nfo', 'torrent', 'zip', 'rar']:
+    #             continue
+    #
+    #         res = re.findall('^S(\d{1,4})E(\d{1,4}(\.5)?)', file_name.upper())
+    #         if res:
+    #             continue
+    #         else:
+    #             logger.info(f'{file_path}')
+    #             os.remove(file_path)
 
     # 遍历文件夹
     for root, dirs, files in os.walk(target_path, topdown=False):
