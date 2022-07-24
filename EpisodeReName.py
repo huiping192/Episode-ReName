@@ -35,6 +35,7 @@ from custom_rules import starts_with_rules
 #     取剩余部分结尾的数字
 #     部分特殊处理
 
+logger.add("file.log")
 script_path = os.path.dirname(os.path.realpath(__file__))
 target_path = ''
 
@@ -278,11 +279,30 @@ def get_series_name(file_path):
 
     logger.info(f"{'获取视频名', file_full_name}")
 
+    #例子: [test] name - 04 (test)].mkv
+    pat = '\](.*?)\- '
+    res = re.findall(pat, file_full_name)
+    if res:
+            series = res[0].strip()
+            logger.info(f"{'获取视频名1', series}")
+            if "]" not in series:
+                return series
+
+    # 例子: [test]name[716][***]
     pat = '\](.*?)\['
     res = re.findall(pat, file_full_name)
     if res:
+        series = res[0]
+        logger.info(f"{'获取视频名2', series}")
+        if series:
+            return series
+
+    #例子: [test][name][03]***
+    pat = '\]\[(.*?)\]\['
+    res = re.findall(pat, file_full_name)
+    if res:
             series = res[0]
-            logger.info(f"{'获取视频名', series}")
+            logger.info(f"{'获取视频名3', series}")
             return series
 
     return None
@@ -669,6 +689,10 @@ if os.path.isdir(target_path):
 
                 series_name = get_series_name(file_path)
 
+                if not series_name:
+                    logger.warning(f'{"series_name", "no found"}')
+                    continue
+
                 new_name = series_name + ' ' + name_format.format(**locals()) + '.' + fix_ext(ext)
 
                 # if custom_replace_pair:
@@ -678,7 +702,7 @@ if os.path.isdir(target_path):
                 logger.info(f'{new_name}')
 
 
-                new_path = '/anime/' + series_name + '/' + new_name
+                new_path = parent_folder_path + '/' + series_name + '/' + new_name
 
                 logger.info(f'{new_path}')
                 file_lists.append([format_path(file_path), format_path(new_path)])
@@ -717,7 +741,7 @@ else:
                 # for replace_old_part, replace_new_part in custom_replace_pair:
                 #     new_name = new_name.replace(replace_old_part, replace_new_part)
 
-            new_path = '/anime/' + series_name + '/' + new_name
+            new_path = parent_folder_path + '/' + series_name + '/' + new_name
 
             logger.info(f'{new_path}')
 
@@ -741,7 +765,6 @@ logger.info(f"{'file_lists', file_lists}")
 error_logs = []
 
 for old, new in file_lists:
-
     if not rename_overwrite:
         # 如果设置不覆盖 遇到已存在的目标文件不强制删除 只记录错误
         if os.path.exists(new):
@@ -758,16 +781,20 @@ for old, new in file_lists:
 
         file_path = os.path.abspath(os.path.join(new, os.pardir))
 
+        logger.info(f"{'path dir', file_path}")
+
         if not os.path.exists(file_path):
+            logger.info(f"{'path dir not exists', file_path}")
             os.makedirs(file_path)
 
         logger.info(f"{'path', file_path}")
         # 临时文件重命名
         # os.rename(tmp_name, new)
-        shutil.move(old, new)
+        new_path = shutil.move(old, new)
+        logger.info(f"{'new path', new_path}")
 
-    except:
-        pass
+    except Exception as e:
+        logger.warning(f"{'error', e}")
 
 if error_logs:
     error_file = os.path.join(application_path, 'error.txt')
