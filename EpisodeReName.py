@@ -183,6 +183,7 @@ def fix_ext(ext):
 
 
 def get_file_name_ext(file_full_name):
+    logger.info(f"{'get_file_name_ext', file_full_name}")
     # 获取文件名和后缀
     file_name = None
     ext = None
@@ -193,7 +194,10 @@ def get_file_name_ext(file_full_name):
             file_name = file_full_name[:-(len(x) + 1)]
             break
     if not ext:
-        file_name, ext = file_full_name.rsplit('.', 1)
+        try:
+            file_name, ext = file_full_name.rsplit('.', 1)
+        except:
+            pass
 
     return file_name, ext
 
@@ -319,6 +323,10 @@ def get_season_and_ep(file_path):
 
     # 获取文件名和后缀
     file_name, ext = get_file_name_ext(file_full_name)
+    if not file_name:
+        return None, None
+    if not ext:
+        return None, None
 
     # _ = get_season_cascaded(parent_folder_path)
     # if not _:
@@ -669,6 +677,10 @@ if os.path.isdir(target_path):
 
             # 只处理媒体文件
             file_name, ext = get_file_name_ext(name)
+            if not file_name:
+                continue
+            if not ext:
+                continue
             if not ext.lower() in COMPOUND_EXTS:
                 continue
 
