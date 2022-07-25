@@ -103,6 +103,7 @@ else:
     ap.add_argument('--replace', type=str, nargs='+', action='append',
                     help='自定义替换关键字, 一般是给字幕用, 用法 `--replace chs chi --replace cht chi` 就能把chs和cht替换成chi, 可以写多组关键字',
                     default=[])
+    ap.add_argument('--save', required=False, help='保存目标路径')
 
     args = vars(ap.parse_args())
     target_path = args['path']
