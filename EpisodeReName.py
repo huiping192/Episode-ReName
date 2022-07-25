@@ -39,6 +39,8 @@ logger.add("file.log")
 script_path = os.path.dirname(os.path.realpath(__file__))
 target_path = ''
 
+save_path = ''
+
 # 重命名的文件移动到season目录下
 move_up_to_season_folder = True
 
@@ -109,6 +111,7 @@ else:
     name_format = args['name_format']
     force_rename = args['force_rename']
     custom_replace_pair = args['replace']
+    save_path = args['save']
 
 if not target_path:
     # 没有路径参数直接退出
@@ -713,8 +716,10 @@ if os.path.isdir(target_path):
                 #         new_name = new_name.replace(replace_old_part, replace_new_part)
                 logger.info(f'{new_name}')
 
-
-                new_path = parent_folder_path + '/' + series_name + '/' + new_name
+                if save_path:
+                    new_path = save_path + '/' + series_name + '/' + new_name
+                else:
+                    new_path = parent_folder_path + '/' + series_name + '/' + new_name
 
                 logger.info(f'{new_path}')
                 file_lists.append([format_path(file_path), format_path(new_path)])
@@ -753,7 +758,11 @@ else:
                 # for replace_old_part, replace_new_part in custom_replace_pair:
                 #     new_name = new_name.replace(replace_old_part, replace_new_part)
 
-            new_path = parent_folder_path + '/' + series_name + '/' + new_name
+            if save_path:
+                new_path = save_path + '/' + series_name + '/' + new_name
+            else:
+                new_path = parent_folder_path + '/' + series_name + '/' + new_name
+
 
             logger.info(f'{new_path}')
 
