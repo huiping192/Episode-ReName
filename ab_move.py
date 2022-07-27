@@ -2,7 +2,7 @@ import os
 import argparse
 import shutil
 
-from loguru import logger
+# from loguru import logger
 
 target_path = ''
 save_path = ''
@@ -22,15 +22,15 @@ def loop_dic(dic_path):
     for file_name in os.listdir(dic_path):
         path = os.path.join(dic_path,file_name)
         if os.path.isfile(path):
-            logger.info(f"{'find file', path}")
+            # logger.info(f"{'find file', path}")
             move_if_needed(path)
         else:
-            logger.info(f"{'find dic', path}")
+            # logger.info(f"{'find dic', path}")
             loop_dic(path)
 
-    if not dic_path == target_path:
-     logger.info(f"{'remove dic', dic_path}")
-     shutil.rmtree(dic_path)
+    # if not dic_path == target_path:
+     # logger.info(f"{'remove dic', dic_path}")
+     # shutil.rmtree(dic_path)
 
 
 def move_if_needed(file_path):
@@ -41,13 +41,13 @@ def move_file(file_path):
     file_name = os.path.basename(file_path)
 
     new = os.path.join(save_path, file_name)
-    logger.info(f"{'new path', new}")
+    # logger.info(f"{'new path', new}")
 
     if os.path.exists(new):
         os.remove(new)
 
-    shutil.move(file_path, new)
-    logger.info(f"{'move path done', new}")
+    shutil.move(file_path, save_path)
+    # logger.info(f"{'move path done', new}")
 
 
 
