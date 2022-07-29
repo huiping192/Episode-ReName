@@ -287,6 +287,15 @@ def get_series_name(file_path):
 
     logger.info(f"{'获取视频名', file_full_name}")
 
+    # 例子: [test] name S01 - 04 (test)].mkv
+    pat = '\](.*?)[Ss](\d{1,4}) \- '
+    res = re.findall(pat, file_full_name)
+    if res:
+        series = res[0][0].strip()
+        logger.info(f"{'获取视频名1', series}")
+        if "]" not in series:
+            return series
+
     #例子: [test] name - 04 (test)].mkv
     pat = '\](.*?)\- '
     res = re.findall(pat, file_full_name)
@@ -366,11 +375,20 @@ def get_season_and_ep(file_path):
         ep = str(int(ep)).zfill(2)
         return season, ep
 
-    season = '01'
+    pat = '[Ss](\d{1,4})'
+    res = re.findall(pat, file_name.upper())
+    if res:
+        season = res[0]
+        logger.info("season",season)
+        season = str(int(season)).zfill(2)
+        logger.info("season",season)
+
+    if not season:
+        season = '01'
 
     # 获取不到季数 退出
-    if not season:
-        return None, None
+    # if not season:
+    #     return None, None
 
     # 根据文件名获取集数
 
