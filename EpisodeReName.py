@@ -40,6 +40,7 @@ script_path = os.path.dirname(os.path.realpath(__file__))
 target_path = ''
 
 save_path = ''
+replace_file = ''
 
 # 重命名的文件移动到season目录下
 move_up_to_season_folder = True
@@ -104,6 +105,7 @@ else:
                     help='自定义替换关键字, 一般是给字幕用, 用法 `--replace chs chi --replace cht chi` 就能把chs和cht替换成chi, 可以写多组关键字',
                     default=[])
     ap.add_argument('--save', required=False, help='保存目标路径')
+    ap.add_argument('--replace_file', required=False, help='replace file name')
 
     args = vars(ap.parse_args())
     target_path = args['path']
@@ -113,6 +115,8 @@ else:
     force_rename = args['force_rename']
     custom_replace_pair = args['replace']
     save_path = args['save']
+    replace_file = args['replace_file']
+    logger.info(f"{'replace_file_path:', replace_file}")
 
 if not target_path:
     # 没有路径参数直接退出
@@ -166,6 +170,26 @@ COMMON_LANG = [
 # 混合后缀
 COMPOUND_EXTS = COMMON_MEDIA_EXTS + ['.'.join(x) for x in
                                      list(product(COMMON_LANG, COMMON_CAPTION_EXTS))] + COMMON_CAPTION_EXTS
+
+def parse_replace_name_file():
+    replace_file_path = replace_file
+    if not replace_file_path:
+        return {}
+    replace_name = {}
+
+    f = open(replace_file_path, 'r', encoding='UTF-8')
+
+    datalist = f.readlines()
+    for line in datalist:
+        array = line.strip().split(',')
+        replace_name[array[0]] = array[1]
+
+    f.close()
+
+    logger.info(f"{'replace file name dic:', replace_name}")
+    return replace_name
+
+replace_name_dic = parse_replace_name_file()
 
 
 def fix_ext(ext):
@@ -727,6 +751,10 @@ if os.path.isdir(target_path):
                     logger.warning(f'{"series_name", "no found"}')
                     continue
 
+                replaced_series_name = replace_name_dic.get(series_name)
+                if replaced_series_name:
+                    series_name = replaced_series_name
+
                 new_name = series_name + ' ' + name_format.format(**locals()) + '.' + fix_ext(ext)
 
                 # if custom_replace_pair:
@@ -769,6 +797,10 @@ else:
             # series = get_series_from_season_path(season_path)
             # new_name = f'S{season}E{ep}' + '.' + fix_ext(ext)
             series_name = get_series_name(file_path)
+
+            replaced_series_name = replace_name_dic.get(series_name)
+            if replaced_series_name:
+                series_name = replaced_series_name
 
             new_name = series_name + ' ' + name_format.format(**locals()) + '.' + fix_ext(ext)
             logger.info(f'{new_name}')
