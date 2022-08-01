@@ -21,8 +21,14 @@ def loop_dic(dic_path):
     for file_name in os.listdir(dic_path):
         path = os.path.join(dic_path, file_name)
         if os.path.isfile(path):
-            rename_file(path)
+            if need_process_file(path):
+                rename_file(path)
 
+def need_process_file(path):
+    file_name = os.path.basename(path)
+    pat = 'S(\d{1,4})E(\d{1,4}(\.5)?)'
+    res = re.match(pat, file_name)
+    return res is None
 
 def get_season_ep(index):
     return get_real_season_ep(1,0,index)
@@ -66,7 +72,7 @@ def rename_file(path):
     print("season, ep:", season, ep)
 
     dic_path = os.path.dirname(path)
-    ex = os.path.splitext(path)
+    ex = path.split('.', 1)
     file_ex = ex[1]
     if not file_ex:
         return
@@ -74,7 +80,7 @@ def rename_file(path):
     season_str = get_int_str(season)
     ep_str = get_int_str(ep)
 
-    file_name = "S" + season_str + "E" + ep_str + file_ex
+    file_name = "S" + season_str + "E" + ep_str + "." + file_ex
     new =  os.path.join(dic_path, file_name)
     print("new:", new)
 
