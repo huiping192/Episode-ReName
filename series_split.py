@@ -129,7 +129,10 @@ def rename_file(path):
     new =  os.path.join(dic_path, file_name)
     print("new:", new)
 
-    os.rename(path, new)
+    if not os.path.exists(new):
+        os.rename(path, new)
+    else:
+        print("new is exists, override skip!")
 
 def get_int_str(num):
     return str(int(num)).zfill(2)

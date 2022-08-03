@@ -65,7 +65,7 @@ def resource_path(relative_path):
 
 # 默认配置
 rename_delay = 0
-rename_overwrite = True
+rename_overwrite = False
 
 # logger.add(os.path.join(application_path, 'app.log'))
 # logger.info(sys.argv)
@@ -848,8 +848,8 @@ for old, new in file_lists:
         # 检测文件能否重命名 报错直接忽略
 
         # 目标文件已存在, 先删除
-        if os.path.exists(new):
-            os.remove(new)
+        # if os.path.exists(new):
+        #     os.remove(new)
 
         file_path = os.path.abspath(os.path.join(new, os.pardir))
 
@@ -862,8 +862,11 @@ for old, new in file_lists:
         logger.info(f"{'path', file_path}")
         # 临时文件重命名
         # os.rename(tmp_name, new)
-        new_path = shutil.move(old, new)
-        logger.info(f"{'new path', new_path}")
+        if not os.path.exists(new):
+            new_path = shutil.move(old, new)
+            logger.info(f"{'new path', new_path}")
+        else:
+            logger.info(f"{'new path exists! move abort', new}")
 
     except Exception as e:
         logger.warning(f"{'error', e}")
