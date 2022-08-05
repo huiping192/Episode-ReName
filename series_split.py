@@ -40,6 +40,7 @@ def loop_dic(dic_path):
         path = os.path.join(dic_path, file_name)
         if os.path.isfile(path):
             if need_process_file(path):
+                print("need handle file", path)
                 rename_file(path)
             else:
                 print("skip file",path)
@@ -53,16 +54,16 @@ def need_process_file(path):
         return False
 
     pat = '[Ss](\d{1,4})[Ee](\d{1,4}(\.5)?)'
-    res = re.match(pat, file_name)
+    res = re.findall(pat, file_name)
     if res:
-        season = res[1]
-        print("season", season)
-        if season == 1:
+        season = res[0][0]
+        print("season found", season)
+        if int(season) == 1:
             return True
         else:
             return False
     else:
-        print("false")
+        print("no found season")
         return True
 
 def find_file_index(path):
