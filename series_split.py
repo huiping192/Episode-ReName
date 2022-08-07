@@ -36,14 +36,22 @@ args = vars(ap.parse_args())
 target_path = args['path']
 
 def loop_dic(dic_path):
+    rule_dic = parse_rule_file(dic_path)
+    need_handle = rule_dic is not None
+    print("rule", rule_dic)
     for file_name in os.listdir(dic_path):
         path = os.path.join(dic_path, file_name)
         if os.path.isfile(path):
+            if not need_handle:
+                continue
             if need_process_file(path):
                 print("need handle file", path)
-                rename_file(path)
+                rename_file(path,rule_dic)
             else:
                 print("skip file",path)
+        elif os.path.isdir(path):
+            loop_dic(path)
+
 
 def need_process_file(path):
     file_name = os.path.basename(path)
@@ -86,10 +94,10 @@ def find_file_index(path):
         print("res",res)
         return int(res[0].strip())
 
-def get_season_ep(index):
-    return get_real_season_ep(1,0,index)
+def get_season_ep(index,rule_dic):
+    return get_real_season_ep(1,0,index,rule_dic)
 
-def get_real_season_ep(season, count, index):
+def get_real_season_ep(season, count, index,rule_dic):
     if season > len(rule_dic.keys()):
         return None,None
     season_ep_count = int(rule_dic[str(season)])
@@ -100,15 +108,15 @@ def get_real_season_ep(season, count, index):
     if index <= season_ep_max:
         return season, ep
     else:
-        return get_real_season_ep(season+1, season_ep_max ,index)
+        return get_real_season_ep(season+1, season_ep_max ,index,rule_dic)
 
 
-def rename_file(path):
+def rename_file(path, rule_dic):
     index = find_file_index(path)
     if not index:
         return
     print("index:", index)
-    season, ep = get_season_ep(index)
+    season, ep = get_season_ep(index,rule_dic)
     if not season:
         return
     if not ep:
@@ -138,12 +146,14 @@ def rename_file(path):
 def get_int_str(num):
     return str(int(num)).zfill(2)
 
-def parse_rule_file():
-    file_path = os.path.join(target_path,"rule.txt")
+def parse_rule_file(dic_path):
+    file_path = os.path.join(dic_path,"rule.txt")
     if not file_path:
-        return {}
-    dic = {}
+        return None
+    if not os.path.exists(file_path):
+        return None
 
+    dic = {}
     f = open(file_path, 'r', encoding='UTF-8')
 
     datalist = f.readlines()
@@ -156,6 +166,4 @@ def parse_rule_file():
     return dic
 
 
-rule_dic = parse_rule_file()
-print("rule",rule_dic)
 loop_dic(target_path)
