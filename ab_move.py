@@ -46,7 +46,7 @@ def loop_dic(dic_path):
 
 
 def move_if_needed(file_path):
-    file_name = os.path.basename(path)
+    file_name = os.path.basename(file_path)
     ext = os.path.splitext(file_name)[1].lower()
     if not ext in exts:
         print("ext no match.")
