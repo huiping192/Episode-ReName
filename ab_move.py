@@ -15,6 +15,17 @@ args = vars(ap.parse_args())
 target_path = args['path']
 save_path = args['save']
 
+COMMON_MEDIA_EXTS = [
+    '.flv',
+    '.mkv',
+    '.mp4',
+    '.avi',
+    '.rmvb',
+    '.m2ts',
+    '.wmv',
+]
+
+exts = COMMON_MEDIA_EXTS
 
 def loop_dic(dic_path):
     for file_name in os.listdir(dic_path):
@@ -35,6 +46,11 @@ def loop_dic(dic_path):
 
 
 def move_if_needed(file_path):
+    file_name = os.path.basename(path)
+    ext = os.path.splitext(file_name)[1].lower()
+    if not ext in exts:
+        print("ext no match.")
+        return False
     if os.path.getsize(file_path) > 80 * 1024 * 1024:
         move_file(file_path)
 

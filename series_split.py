@@ -58,7 +58,7 @@ def need_process_file(path):
 
     ext = os.path.splitext(file_name)[1].lower()
     if not ext in exts:
-        print("false1")
+        print("ext no match.")
         return False
 
     pat = '[Ss](\d{1,4})[Ee](\d{1,4}(\.5)?)'
