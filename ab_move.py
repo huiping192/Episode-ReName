@@ -34,7 +34,7 @@ def loop_dic(dic_path):
             # logger.info(f"{'find file', path}")
             print("find file ", path)
             move_if_needed(path)
-        # else:
+        elif os.path.isdir(path):
             # logger.info(f"{'find dic', path}")
             print("find dic ", path)
             loop_dic(path)
