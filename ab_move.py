@@ -23,6 +23,7 @@ COMMON_MEDIA_EXTS = [
     '.rmvb',
     '.m2ts',
     '.wmv',
+    '.webm',
 ]
 
 exts = COMMON_MEDIA_EXTS
