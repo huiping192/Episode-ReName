@@ -43,9 +43,10 @@ def loop_dic(dic_path):
 
     if not dic_path == target_path:
         print("remove dic", dic_path)
-        # logger.info(f"{'remove dic', dic_path}")
-        shutil.rmtree(dic_path)
-
+        try:
+            shutil.rmtree(dic_path)
+        except Exception as e:
+            print(e)
 
 def move_if_needed(file_path):
     file_name = os.path.basename(file_path)
