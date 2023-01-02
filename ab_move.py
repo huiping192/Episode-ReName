@@ -24,6 +24,7 @@ COMMON_MEDIA_EXTS = [
     '.m2ts',
     '.wmv',
     '.webm',
+    '.ts',
 ]
 
 exts = COMMON_MEDIA_EXTS
@@ -53,8 +54,10 @@ def move_if_needed(file_path):
         print("ext no match.")
         return False
     if os.path.getsize(file_path) > 80 * 1024 * 1024:
-        move_file(file_path)
-
+        try:
+            move_file(file_path)
+        except Exception as e:
+            print(e)
 
 def move_file(file_path):
     file_name = os.path.basename(file_path)
